@@ -1,0 +1,69 @@
+1. Install go lang ( version > 1.8 because we need sort.slice ) and config GOPATH
+2. Install gokit ( current directory is GOPATH )
+    go get  -t -v ./...
+    go get github.com/go-kit/kit
+3. Intsall gokit cli and others
+    go get github.com/kujtimiihoxha/kit
+    go get github.com/gorilla/mux
+    go get github.com/gorilla/handlers
+    go get gopkg.in/mgo.v2
+	go get github.com/openzipkin/zipkin-go-opentracing
+4. Create services:
+    kit new service ${name}. Ex: kit new service accounts
+5. Create io.go that contains mongodb model
+    accounts/
+    |---pkg/
+    |------io/
+    |----------io.go 
+    Ex: 
+    type Account struct {
+        Id       bson.ObjectId `json:"id" bson:"_id"`
+        Uuid     string        `json:"uuid"  bson:"uuid"`
+        Type     string        `json:"type" bson:"type"`
+        Currency float32       `json:"currency" bson:"currency"`
+        Balance  float32       `json:"balance" bson:"balance"`
+        Number   float32       `json:"number" bson:"number"`
+    }
+6. Define apis in service:
+    Ex: 
+    type AccountsService interface {
+        Get(ctx context.Context) (t []io.Account, error error)
+        Create(ctx context.Context, account io.Account) (t io.Account, error error)
+        Deposit(ctx context.Context) (error error)
+        Withdraw(ctx context.Context) (error error)
+        Drop(ctx context.Context) (error error)
+    }
+6. Generate services:
+    kit g s accounts -w --gorilla
+7. Create sb.go to connect to mongodb
+    accounts/
+        |---pkg/
+        |------db/
+        |----------db.go
+    Ex:
+    package db
+
+    import (
+        mgo "gopkg.in/mgo.v2"
+    )
+
+    var mgoSession *mgo.Session
+    var mongo_conn_str = "mongodb://localhost:27017"
+
+    // Creates a new session if mgoSession is nil i.e there is no active mongo session.
+    //If there is an active mongo session it will return a Clone
+    func GetMongoSession() (*mgo.Session, error) {
+        if mgoSession == nil {
+            var err error
+            mgoSession, err = mgo.Dial(mongo_conn_str)
+            if err != nil {
+                return nil, err
+            }
+        }
+        return mgoSession.Clone(), nil
+    }
+8. Implement your services(See accounts modules)
+9. Run: 
+    go run accounts/cmd/main.go
+10. Post man share connection:
+    https://www.getpostman.com/collections/457dfb13e4c7292980fc

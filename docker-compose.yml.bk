@@ -1,0 +1,36 @@
+version: "2"
+services:
+  accounts:
+    build:
+      context: .
+      dockerfile: accounts/Dockerfile
+    environment:
+      - MONGO_CONN_STR=mongodb://mongo/accounts
+    restart: always
+    volumes:
+    - .:/go/src/ebanking-gokit
+    container_name: accounts
+    ports:
+    - 8801:8081
+  # authentication:
+  #   build:
+  #     context: .
+  #     dockerfile: authentication/Dockerfile
+  #   restart: always
+  #   volumes:
+  #   - .:/go/src/ebanking-gokit
+  #   container_name: authentication
+  #   ports:
+  #   - 8802:8081
+  # transactions:
+  #   build:
+  #     context: .
+  #     dockerfile: transactions/Dockerfile
+  #   restart: always
+  #   volumes:
+  #   - .:/go/src/ebanking-gokit
+  #   container_name: transactions
+  #   ports:
+  #   - 8800:8081
+  mongo:
+    image: mongo:4.0.6
